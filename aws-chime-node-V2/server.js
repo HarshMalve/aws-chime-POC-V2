@@ -1,6 +1,9 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
+const express = require('express');
+const app = express();
 const config = require('./config');
+const cors = require('cors');
 const AWS = require('aws-sdk');
 const compression = require('compression');
 const fs = require('fs');
@@ -9,6 +12,19 @@ const url = require('url');
 const { v4: uuidv4 } = require('uuid');
 const dotenv = require('dotenv');
 dotenv.config();
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({
+    extended: true
+}));
+
+app.use(function(req, res, next){
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    return next();
+});
+
 // Store created meetings in a map so attendees can join by meeting title.
 const meetingTable = {};
 
@@ -45,19 +61,24 @@ if (captureS3Destination) {
 } else {
   console.info(`S3 destination for capture not set.  Cloud media capture will not be available.`)
 }
-
-function serve() {
   // Start an HTTP server to serve the index page and handle meeting actions
-  http.createServer({}, async (request, response) => {
+  http.createServer(app).listen(config.app.port, () => {
+    log(`server running at http://localhost:${config.app.port}/`);
+  });
+
+app.route('/').get((req, res, next) => {
+  respond(res, 200, 'text/html', 'Server is Working');
+});
+app.route('*').post(async (request, response) => {
     log(`${request.method} ${request.url} BEGIN`);
     try {
       // Enable HTTP compression
       compression({})(request, response, () => {});
       const requestUrl = url.parse(request.url, true);
-    //   if (request.method === 'GET' && requestUrl.pathname === '/') {
-    //     // Return the contents of the index page
-    //     respond(response, 200, 'text/html', indexPage);
-    //   } else
+      if (request.method === 'GET' && requestUrl.pathname === '/') {
+        // Return the contents of the index page
+        respond(response, 200, 'text/html', 'Server is Working');
+      } else
        if (process.env.DEBUG && request.method === 'POST' && requestUrl.pathname === '/join') {
         // For internal debugging - ignore this.
         respond(response, 201, 'application/json', JSON.stringify(require('./debug.js').debug(requestUrl.query), null, 2));
@@ -214,11 +235,7 @@ function serve() {
       respond(response, 400, 'application/json', JSON.stringify({ error: err.message }, null, 2));
     }
     log(`${request.method} ${request.url} END`);
-  }).listen(config.app.port, () => {
-    log(`server running at http://${config.app.port}/`);
-  });
-}
-
+});
 function log(message) {
   console.log(`${new Date().toISOString()} ${message}`);
 }
@@ -227,10 +244,11 @@ function respond(response, statusCode, contentType, body, skipLogging = false) {
   response.statusCode = statusCode;
   response.setHeader('Content-Type', contentType);
   response.setHeader('Access-Control-Allow-Origin', '*');
+  response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET');
   response.end(body);
   if (contentType === 'application/json' && !skipLogging) {
     log(body);
   }
 }
-serve();
+// serve();
 // module.exports = { serve };

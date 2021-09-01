@@ -1,3 +1,10 @@
 aws-chime-node-V2/node_modules
 aws-chime-node-V2/package-lock.json
 aws-chime-node-V2/.env
+aws-chime-node/node_modules
+aws-chime-node/package-lock.json
+aws-chime-node/.env
+aws-chime-ionic/node_modules
+aws-chime-ionic/package-lock.json
+aws-chime-ionic/platforms
+aws-chime-ionic/plugins

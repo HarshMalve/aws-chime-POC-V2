@@ -1,0 +1,58 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      AWS Chime POC
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">AWS Chime POC</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <div style="width: 100%; display: flex; flex-direction: row;">
+    <div id="tile-0" class="video-tile" style="width: 50%;">
+      <video id="video-0" class="video-tile-video" style="margin: 1rem; width: 100%;"></video>
+    </div>
+
+    <div id="tile-1" class="video-tile" style="width: 50%;">
+      <video id="video-1" class="video-tile-video" style="margin: 1rem; width: 100%;"></video>
+    </div>
+  </div>
+  <div id="container">
+    <div id="container" *ngIf="isViewJoin">
+      <h5 strong>
+        Join a Meeting
+      </h5>
+      <!-- <strong>Ready to create an app?</strong>
+      <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p> -->
+      <div>
+        <ion-input [(ngModel)]="userDetails.ExternalMeetingId" required maxlength="50" placeholder="Meeting Id"></ion-input>
+        <ion-input [(ngModel)]="userDetails.ExternalUserId" required maxlength="50" placeholder="User Id"></ion-input>
+      </div>
+      <div>
+        <ion-button color="dark" expand="block" (click)="createAttendeeAndJoin(2)">Join</ion-button>
+      </div>
+      <h6 strong>OR</h6>
+      <a (click)="changeView()">Create a new meeting</a>
+    </div>
+  
+    <div id="container" *ngIf="isViewCreate">
+      <h5 strong>
+        Create a Meeting
+      </h5>
+      <div>
+        <!-- <ion-input [(ngModel)]="userDetails.ClientRequestToken" required maxlength="50" placeholder="Client Request Token"></ion-input> -->
+        <ion-input [(ngModel)]="userDetails.ExternalMeetingId" required maxlength="50" placeholder="Meeting Id"></ion-input>
+        <ion-input [(ngModel)]="userDetails.MeetingHostId" required maxlength="50" placeholder="Host Id"></ion-input>
+      </div>
+      <div>
+        <ion-button color="dark" expand="block" (click)="createMeeting(userDetails)">Create</ion-button>
+      </div>
+      <h6 strong>OR</h6>
+      <a (click)="changeView()">Join a meeting</a>
+    </div>
+  </div>
+</ion-content>
