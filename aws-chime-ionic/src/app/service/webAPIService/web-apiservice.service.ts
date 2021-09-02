@@ -8,10 +8,12 @@ import 'rxjs/add/operator/map';
 })
 export class WebAPIServiceService {
   private headers = new HttpHeaders();
-  
+
   createMeeting = API.domain + API.url.createMeeting;
   getMeeting = API.domain + API.url.getMeetingDetails;
   createAttendee = API.domain + API.url.createAttendee;
+  endMeeting = API.domain + API.url.deleteMeeting;
+
   constructor(public http: HttpClient) {
 
   }
@@ -37,6 +39,15 @@ export class WebAPIServiceService {
   async createAtt(data: any): Promise<any> {
     try {
       const response = await this.http.post(this.createAttendee, data, { headers: this.headers }).toPromise();
+      return response;
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  async deleteMeeting(data: any): Promise<any> {
+    try {
+      const response = await this.http.post(this.endMeeting, data, { headers: this.headers }).toPromise();
       return response;
     } catch (error) {
       return this.handleError(error);
