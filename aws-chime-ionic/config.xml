@@ -53,7 +53,6 @@
         <config-file parent="NSMicrophoneUsageDescription" target="*-Info.plist">
             <string>AWS Chime POC would like to access your microphone</string>
         </config-file>
-        <hook src="hooks/iosrtc-swift-support.js" type="after_platform_add" />
         <icon height="57" src="resources/ios/icon/icon.png" width="57" />
         <icon height="114" src="resources/ios/icon/icon@2x.png" width="114" />
         <icon height="29" src="resources/ios/icon/icon-small.png" width="29" />
@@ -112,9 +111,6 @@
     <plugin name="cordova-plugin-ionic-webview" spec="^4.0.0" />
     <plugin name="cordova-plugin-ionic-keyboard" spec="^2.0.5" />
     <plugin name="cordova-plugin-android-permissions" spec="^1.1.2" />
-    <plugin name="cordova-plugin-iosrtc" spec="^6.0.21">
-        <variable name="MANUAL_INIT_AUDIO_DEVICE" value="FALSE" />
-    </plugin>
     <engine name="android" spec="^8.1.0" />
-    <engine name="ios" spec="^4.5.5" />
+    <engine name="ios" spec="^6.2.0" />
 </widget>

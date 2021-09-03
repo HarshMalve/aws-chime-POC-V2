@@ -10,7 +10,7 @@ export class ApiService {
 
 export const API = {
   // domain: 'http://localhost:8085', // dev
-  domain: 'https://b226-2409-4042-238d-a50f-d8ec-78a3-4767-b3ae.ngrok.io', // dev
+  domain: 'https://15aa-152-57-160-23.ngrok.io', // dev
   url: {
     createMeeting: '/api/chimeAPI/aws_chime_routes/createMeeting',
     createAttendee: '/api/chimeAPI/aws_chime_routes/createAttendee',
