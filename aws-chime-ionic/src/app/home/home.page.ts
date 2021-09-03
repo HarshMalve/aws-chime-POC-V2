@@ -31,6 +31,9 @@ import {
   VideoFrameProcessor,
   VoiceFocusTransformDevice,
   DataMessage,
+  MeetingSessionPOSTLogger,
+  DefaultAudioMixController,
+  DefaultBrowserBehavior,
 
 } from 'amazon-chime-sdk-js';
 import { API } from '../service/api/api.service';
@@ -38,6 +41,15 @@ import { Platform } from '@ionic/angular';
 declare var global: any;
 import * as markdown from "markdown-it";
 declare var cordova;
+
+let fatal: (e: Error) => void;
+
+// This shim is needed to avoid warnings when supporting Safari.
+declare global {
+  interface Window {
+    webkitAudioContext: typeof AudioContext
+  }
+}
 class DemoTileOrganizer {
   // this is index instead of length
   static MAX_TILES = 1;
@@ -82,7 +94,59 @@ let SHOULD_DIE_ON_FATALS = (() => {
 
 type VideoFilterName = 'Emojify' | 'CircularCut' | 'NoOp' | 'Segmentation' | 'None';
 
-const VIDEO_FILTERS: VideoFilterName[] = ['Emojify', 'CircularCut', 'NoOp'];
+const VIDEO_FILTERS: VideoFilterName[] = ['Emojify', 'CircularCut', 'NoOp']; class TestSound {
+  static testAudioElement = new Audio();
+
+  constructor(
+    private logger: Logger,
+    private sinkId: string | null,
+    private frequency: number = 440,
+    private durationSec: number = 1,
+    private rampSec: number = 0.1,
+    private maxGainValue: number = 0.1
+  ) { }
+
+  async init(): Promise<void> {
+    const audioContext: AudioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const gainNode = audioContext.createGain();
+    gainNode.gain.value = 0;
+    const oscillatorNode = audioContext.createOscillator();
+    oscillatorNode.frequency.value = this.frequency;
+    oscillatorNode.connect(gainNode);
+    const destinationStream = audioContext.createMediaStreamDestination();
+    gainNode.connect(destinationStream);
+    const currentTime = audioContext.currentTime;
+    const startTime = currentTime + 0.1;
+    gainNode.gain.linearRampToValueAtTime(0, startTime);
+    gainNode.gain.linearRampToValueAtTime(this.maxGainValue, startTime + this.rampSec);
+    gainNode.gain.linearRampToValueAtTime(
+      this.maxGainValue,
+      startTime + this.rampSec + this.durationSec
+    );
+    gainNode.gain.linearRampToValueAtTime(0, startTime + this.rampSec * 2 + this.durationSec);
+    oscillatorNode.start();
+    const audioMixController = new DefaultAudioMixController(this.logger);
+    if (new DefaultBrowserBehavior().supportsSetSinkId()) {
+      try {
+        // @ts-ignore
+        await audioMixController.bindAudioDevice({ deviceId: this.sinkId });
+      } catch (e) {
+        // fatal(e);
+        this.logger?.error(`Failed to bind audio device: ${e}`);
+      }
+    }
+    try {
+      await audioMixController.bindAudioElement(TestSound.testAudioElement);
+    } catch (e) {
+      // fatal(e);
+      this.logger?.error(`Failed to bind audio element: ${e}`);
+    }
+    await audioMixController.bindAudioStream(destinationStream.stream);
+    new TimeoutScheduler((this.rampSec * 2 + this.durationSec + 1) * 1000).start(() => {
+      audioContext.close();
+    });
+  }
+}
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -629,7 +693,7 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
     // this.refreshVideos();
   };
 
-  
+
 
   refreshVideos() {
     if (this.platform.is('ios') && this.platform.is('cordova')) {
@@ -838,21 +902,33 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
 
   async populateAllDeviceLists() {
     const videoInputDevices = await this.audioVideo.listVideoInputDevices();
-    const audioInputDeivices = await this.audioVideo.listAudioInputDevices();
+    const audioInputDevices = await this.audioVideo.listAudioInputDevices();
+    const audioOutputDevices = await this.audioVideo.listAudioOutputDevices();
     // await this.audioVideo.chooseAudioInputDevice(null);
     // await this.audioVideo.chooseAudioOutputDevice(null);
     const videoInputDeviceInfo = videoInputDevices[0];
-    const audioVideoDeviceInfo = audioInputDeivices[0];
+    const audioVideoDeviceInfo = audioInputDevices[0];
+    const audioOutputDeviceInfo = audioOutputDevices[0];
     if (videoInputDeviceInfo) {
       await this.audioVideo.chooseVideoInputDevice(videoInputDeviceInfo.deviceId);
     }
     if (audioVideoDeviceInfo) {
       await this.audioVideo.chooseAudioInputDevice(audioVideoDeviceInfo.deviceId);
     }
+    if (audioOutputDeviceInfo) {
+      await this.audioVideo.chooseAudioOutputDevice(audioOutputDeviceInfo.deviceId);
+    }
     // this.audioVideo.addDeviceChangeObserver(this);
     // this.audioVideo.startVideoPreviewForVideoInput(
     //   document.getElementById('video-preview') as HTMLVideoElement
     // );
+    const audioMix = document.getElementById('meeting-audio') as HTMLAudioElement;
+    try {
+      await this.audioVideo.bindAudioElement(audioMix);
+    } catch (e) {
+      fatal(e);
+      this.log('failed to bindAudioElement', e);
+    }
   }
 
 
@@ -1208,5 +1284,12 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
     } else {
       this.log('Message is throttled. Please resend');
     }
+  }
+
+  meetingEventPOSTLogger: MeetingSessionPOSTLogger;
+  async testSound() {
+    const audioOutput = document.getElementById('audio-output') as HTMLSelectElement;
+    const testSound = new TestSound(this.meetingEventPOSTLogger, audioOutput.value);
+    await testSound.init();
   }
 }

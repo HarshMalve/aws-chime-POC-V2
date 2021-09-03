@@ -25,6 +25,16 @@
     </div> -->
 
     <div style="width: 100%; display: flex; flex-direction: row;" [hidden]="!videoOn">
+        <!-- <div class="row mt-3">
+            <div class="col-12 col-sm-8">
+                <label for="audio-output block">Speaker</label>
+                <select id="audio-output" class="custom-select" style="width:100%"></select>
+            </div>
+            <div class="col-sm-4">
+                <button id="button-test-sound" class="btn btn-outline-secondary btn-block h-50 d-sm-block" style="margin-top:2rem" (click)="testSound()">Test</button>
+            </div>
+        </div> -->
+        <audio id="meeting-audio" style="display:none"></audio>
         <div id="tile-transcript-container">
             <div id="tile-area" class="v-grid">
                 <div id="tile-0" class="video-tile" style="width: 50%;">
