@@ -1,0 +1,7 @@
+{
+  "name": "aws-chime-ionic-V2",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
+}

@@ -9,8 +9,8 @@ aws-chime-ionic/package-lock.json
 aws-chime-ionic/platforms
 aws-chime-ionic/plugins
 aws-chime-ionic/www
-aws-chime-ionic-V2/node_modules
-aws-chime-ionic-V2/package-lock.json
-aws-chime-ionic-V2/platforms
-aws-chime-ionic-V2/plugins
-aws-chime-ionic-V2/www
+aws-chime-ionic-V2s/node_modules
+aws-chime-ionic-V2s/package-lock.json
+aws-chime-ionic-V2s/platforms
+aws-chime-ionic-V2s/plugins
+aws-chime-ionic-V2s/www
