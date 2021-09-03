@@ -34,9 +34,10 @@ import {
 
 } from 'amazon-chime-sdk-js';
 import { API } from '../service/api/api.service';
+import { Platform } from '@ionic/angular';
 declare var global: any;
 import * as markdown from "markdown-it";
-
+declare var cordova;
 class DemoTileOrganizer {
   // this is index instead of length
   static MAX_TILES = 1;
@@ -176,7 +177,8 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
     public webApi: WebAPIServiceService,
     public loadingCtrl: LoadingController,
     public alertCtrl: AlertController,
-    public toastCtrl: ToastController
+    public toastCtrl: ToastController,
+    public platform: Platform
   ) {
     // global = this;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -624,7 +626,16 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
     await this.populateAllDeviceLists();
     await this.startLocalVideoButton();
     await this.join();
+    // this.refreshVideos();
   };
+
+  
+
+  refreshVideos() {
+    if (this.platform.is('ios') && this.platform.is('cordova')) {
+      cordova.plugins.iosrtc.refreshVideos();
+    }
+  }
 
   async join(): Promise<void> {
     window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {

@@ -10,14 +10,15 @@ import { AppRoutingModule } from './app-routing.module';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-
+// import { Diagnostic } from '@ionic-native/diagnostic/ngx';
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, HttpClientModule],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    AndroidPermissions
+    AndroidPermissions, 
+    // Diagnostic
   ],
   bootstrap: [AppComponent],
 })
