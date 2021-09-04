@@ -243,6 +243,7 @@ app.route('*').post(async (request, response) => {
         respond(response, 404, 'text/html', '404 Not Found');
       }
     } catch (err) {
+      log(`${request.method} ${request.url} caused an error here ===> ${err}`);
       respond(response, 400, 'application/json', JSON.stringify({ error: err.message }, null, 2));
     }
     log(`${request.method} ${request.url} END`);
