@@ -69,7 +69,7 @@ const httpsOptions = {
   key: fs.readFileSync(path.join('/etc/letsencrypt/live/harshmalve.com/privkey.pem'))
 };
 
-https.createServer(httpsOptions, app).listen(httpsPort, function () {
+https.createServer(httpsOptions, app).listen(config.app.port, function () {
   log(`server running at ${config.app.port}`);
 });
   // Start an HTTP server to serve the index page and handle meeting actions
