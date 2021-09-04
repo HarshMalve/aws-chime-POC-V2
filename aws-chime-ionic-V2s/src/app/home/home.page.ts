@@ -458,7 +458,7 @@ export class HomePage implements OnInit, AudioVideoObserver, DeviceChangeObserve
         await this.authenticate();
         await this.openAudioOutputFromSelection();
         await this.join();
-        // this.displayButtonStates();
+        this.displayButtonStates();
         this.switchToFlow('flow-meeting');
       });
     } else {
@@ -829,7 +829,7 @@ export class HomePage implements OnInit, AudioVideoObserver, DeviceChangeObserve
           await this.join();
           this.audioVideo.chooseVideoInputDevice(null);
           this.hideProgress('progress-join');
-          // this.displayButtonStates();
+          this.displayButtonStates();
           this.switchToFlow('flow-meeting');
 
           if (DEBUG_LOG_PPS) {
@@ -878,16 +878,16 @@ export class HomePage implements OnInit, AudioVideoObserver, DeviceChangeObserve
     });
 
     const buttonRecordSelf = document.getElementById('button-record-self');
-    // let recorder: MediaRecorder;
+    let recorder: MediaRecorder;
     buttonRecordSelf.addEventListener('click', _e => {
       const chunks: Blob[] = [];
       AsyncScheduler.nextTick(async () => {
-        // if (!this.toggleButton('button-record-self')) {
-        //   console.info('Stopping recorder ', recorder);
-        //   recorder.stop();
-        //   recorder = undefined;
-        //   return;
-        // }
+        if (!this.toggleButton('button-record-self')) {
+          console.info('Stopping recorder ', recorder);
+          recorder.stop();
+          recorder = undefined;
+          return;
+        }
 
         // Combine the audio and video streams.
         const mixed = new MediaStream();
@@ -904,31 +904,31 @@ export class HomePage implements OnInit, AudioVideoObserver, DeviceChangeObserve
         const input = await av.mediaStreamBroker.acquireAudioInputStream();
         mixed.addTrack(input.getAudioTracks()[0]);
 
-        // recorder = new MediaRecorder(mixed, { mimeType: 'video/webm; codecs=vp9' });
-        // console.info('Setting recorder to', recorder);
-        // recorder.ondataavailable = (event) => {
-        //   if (event.data.size) {
-        //     chunks.push(event.data);
-        //   }
-        // };
+        recorder = new MediaRecorder(mixed, { mimeType: 'video/webm; codecs=vp9' });
+        console.info('Setting recorder to', recorder);
+        recorder.ondataavailable = (event) => {
+          if (event.data.size) {
+            chunks.push(event.data);
+          }
+        };
 
-        // recorder.onstop = () => {
-        //   const blob = new Blob(chunks, {
-        //     type: 'video/webm',
-        //   });
-        //   chunks.length = 0;
-        //   const url = URL.createObjectURL(blob);
-        //   const a = document.createElement('a');
-        //   document.body.appendChild(a);
-        //   /* @ts-ignore */
-        //   a.style = 'display: none';
-        //   a.href = url;
-        //   a.download = 'recording.webm';
-        //   a.click();
-        //   window.URL.revokeObjectURL(url);
-        // };
+        recorder.onstop = () => {
+          const blob = new Blob(chunks, {
+            type: 'video/webm',
+          });
+          chunks.length = 0;
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          document.body.appendChild(a);
+          /* @ts-ignore */
+          a.style = 'display: none';
+          a.href = url;
+          a.download = 'recording.webm';
+          a.click();
+          window.URL.revokeObjectURL(url);
+        };
 
-        // recorder.start();
+        recorder.start();
       });
     });
 
@@ -3075,6 +3075,11 @@ export class HomePage implements OnInit, AudioVideoObserver, DeviceChangeObserve
     await this.initializeMeetingSession(configuration);
     const url = new URL(window.location.href);
     url.searchParams.set('m', this.meeting);
+    url.searchParams.set('confirm-end', 'true');
+    // url.searchParams.set('record', 'true');
+    // url.searchParams.set('broadcast', 'true');
+    // url.searchParams.set('abort-on-reconnect', 'true');
+    // url.searchParams.set('max-content-share', 'true');
     history.replaceState({}, `${this.meeting}`, url.toString());
     return configuration.meetingId;
   }
