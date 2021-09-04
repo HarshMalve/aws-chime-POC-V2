@@ -7,6 +7,7 @@ const cors = require('cors');
 const AWS = require('aws-sdk');
 const compression = require('compression');
 const fs = require('fs');
+const https = require('https');
 const http = require('http');
 const url = require('url');
 const { v4: uuidv4 } = require('uuid');
@@ -61,10 +62,19 @@ if (captureS3Destination) {
 } else {
   console.info(`S3 destination for capture not set.  Cloud media capture will not be available.`)
 }
+
+const httpsOptions = {
+  cert: fs.readFileSync(path.join('/etc/letsencrypt/live/harshmalve.com/cert.pem')),
+  key: fs.readFileSync(path.join('/etc/letsencrypt/live/harshmalve.com/privkey.pem'))
+};
+
+https.createServer(httpsOptions, app).listen(httpsPort, function () {
+  log(`server running at ${config.app.port}`);
+});
   // Start an HTTP server to serve the index page and handle meeting actions
-  http.createServer(app).listen(config.app.port, (request, response) => {
-    log(`server running at ${config.app.port}`);
-  });
+  // http.createServer(app).listen(config.app.port, (request, response) => {
+  //   log(`server running at ${config.app.port}`);
+  // });
 
 app.route('/').get((req, res, next) => {
   respond(res, 200, 'text/html', 'Server is Working');
