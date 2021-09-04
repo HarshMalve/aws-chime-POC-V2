@@ -8,7 +8,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 
 const app = express();
-const directoryToServe = 'server/frontend/';
+const directoryToServe = 'aws-chime-web-server/files/';
 const httpsPort = 443;
 const httpPort = 80;
 
