@@ -84,7 +84,7 @@ let SHOULD_EARLY_CONNECT = (() => {
 })();
 
 let SHOULD_DIE_ON_FATALS = (() => {
-  const isLocal = document.location.host === '127.0.0.1:8100' || document.location.host === 'localhost:8100';
+  const isLocal = document.location.host === '127.0.0.1:8100' || document.location.host === 'localhost:8100' || document.location.host === 'localhost';
   const fatalYes = document.location.search.includes('fatal=1');
   const fatalNo = document.location.search.includes('fatal=0');
   return fatalYes || (isLocal && !fatalNo);
@@ -1694,7 +1694,7 @@ export class HomePage implements OnInit, AudioVideoObserver, DeviceChangeObserve
   }
 
   private isLocalHost(): boolean {
-    return document.location.host === '127.0.0.1:8100' || document.location.host === 'localhost:8100';
+    return document.location.host === '127.0.0.1:8100' || document.location.host === 'localhost:8100' || document.location.host === 'localhost';
   }
 
   async join(): Promise<void> {
@@ -2331,6 +2331,32 @@ export class HomePage implements OnInit, AudioVideoObserver, DeviceChangeObserve
     await this.populateAudioInputList();
     await this.populateVideoInputList();
     await this.populateAudioOutputList();
+    // await this.populateAllDeviceListsDefault();
+  }
+
+  async populateAllDeviceListsDefault() {
+    const videoInputDevices = await this.audioVideo.listVideoInputDevices();
+    const audioInputDevices = await this.audioVideo.listAudioInputDevices();
+    const audioOutputDevices = await this.audioVideo.listAudioOutputDevices();
+    const videoInputDeviceInfo = videoInputDevices[0];
+    const audioVideoDeviceInfo = audioInputDevices[0];
+    const audioOutputDeviceInfo = audioOutputDevices[0];
+    if (videoInputDeviceInfo) {
+      await this.audioVideo.chooseVideoInputDevice(videoInputDeviceInfo.deviceId);
+    }
+    if (audioVideoDeviceInfo) {
+      await this.audioVideo.chooseAudioInputDevice(audioVideoDeviceInfo.deviceId);
+    }
+    if (audioOutputDeviceInfo) {
+      await this.audioVideo.chooseAudioOutputDevice(audioOutputDeviceInfo.deviceId);
+    }
+    const audioMix = document.getElementById('meeting-audio') as HTMLAudioElement;
+    try {
+      await this.audioVideo.bindAudioElement(audioMix);
+    } catch (e) {
+      fatal(e);
+      this.log('failed to bindAudioElement', e);
+    }
   }
 
   private async selectVideoFilterByName(name: VideoFilterName): Promise<void> {

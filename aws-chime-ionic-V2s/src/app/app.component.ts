@@ -18,6 +18,7 @@ export class AppComponent {
   }
 
   askPermissions() {
+    console.log('Asking for permissions...');
     if (this.platform.is('android')) {
       this.platform.ready().then(() => {
         this.androidPermissions.requestPermissions(
