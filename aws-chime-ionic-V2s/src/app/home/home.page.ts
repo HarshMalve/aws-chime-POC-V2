@@ -262,7 +262,7 @@ export class HomePage implements OnInit, AudioVideoObserver, DeviceChangeObserve
   //   location.host,
   //   location.pathname.replace(/\/*$/, '/').replace('/v2', ''),
   // ].join('');
-  static readonly BASE_URL: string = '65.0.63.113:8080/';
+  static readonly BASE_URL: string = 'https://harshmalve.com:8080/';
   // static readonly BASE_URL: string = 'https://fb8f-2409-4042-238d-a50f-a09e-fc21-1f73-23e2.ngrok.io/';
   static testVideo: string =
     'https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/Big_Buck_Bunny_4K.webm/Big_Buck_Bunny_4K.webm.360p.vp9.webm';
