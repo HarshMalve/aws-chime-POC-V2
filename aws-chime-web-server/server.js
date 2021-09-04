@@ -21,7 +21,6 @@ var httpsOptions = {
     key: fs.readFileSync(path.join('/etc/letsencrypt/live/harshmalve.com/privkey.pem'))
 };
 
-
 https.createServer(httpsOptions, app).listen(httpsPort, function () {
     console.log('Magic happens on port ' + httpsPort);
 });
@@ -33,3 +32,8 @@ http.createServer(function (req, res) {
     console.log("https://" + req.headers['host'].replace(httpPort, httpsPort) + req.url);
     res.end();
 }).listen(httpPort);
+
+app.route('/home').get((req, res, next) => {
+    console.log('request ' + req.url);
+    res.status(302).redirect('/')
+  });

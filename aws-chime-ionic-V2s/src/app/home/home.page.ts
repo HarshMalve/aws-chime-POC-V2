@@ -1694,7 +1694,7 @@ export class HomePage implements OnInit, AudioVideoObserver, DeviceChangeObserve
   }
 
   private isLocalHost(): boolean {
-    return document.location.host === '127.0.0.1:8100' || document.location.host === 'localhost:8100' || document.location.host === 'localhost';
+    return document.location.host === '127.0.0.1:8100' || document.location.host === 'localhost:8100' || document.location.host === 'harshmalve.com';
   }
 
   async join(): Promise<void> {
