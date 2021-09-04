@@ -8,18 +8,13 @@ const path = require('path');
 const bodyParser = require('body-parser');
 
 const app = express();
-const directoryToServe = 'aws-chime-web-server/files/';
+
 const httpsPort = 443;
 const httpPort = 80;
 
 app.use(bodyParser.urlencoded({ extended: true })); 
-app.use('/static', express.static('files'));
 
-app.get('/', function (req, res) {
-    console.log('path ' + path.join(__dirname, '..', directoryToServe));
-    res.sendFile(path.join(__dirname, '..', directoryToServe));
-});
-
+app.use(express.static('./files'));
 
 var httpsOptions = {
     cert: fs.readFileSync(path.join('/etc/letsencrypt/live/harshmalve.com/cert.pem')),
