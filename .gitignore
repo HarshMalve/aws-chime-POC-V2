@@ -1,3 +1,4 @@
+.vscode
 aws-chime-node-V2/node_modules
 aws-chime-node-V2/package-lock.json
 aws-chime-node-V2/.env
@@ -14,3 +15,6 @@ aws-chime-ionic-V2s/package-lock.json
 aws-chime-ionic-V2s/platforms
 aws-chime-ionic-V2s/plugins
 aws-chime-ionic-V2s/www
+aws-chime-web-server/node_modules
+aws-chime-web-server/package-lock.json
+aws-chime-web-server/files

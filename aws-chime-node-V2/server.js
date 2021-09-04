@@ -62,8 +62,8 @@ if (captureS3Destination) {
   console.info(`S3 destination for capture not set.  Cloud media capture will not be available.`)
 }
   // Start an HTTP server to serve the index page and handle meeting actions
-  http.createServer(app).listen(config.app.port, () => {
-    log(`server running at http://localhost:${config.app.port}/`);
+  http.createServer(app).listen(config.app.port, (request, response) => {
+    log(`server running at ${config.app.port}`);
   });
 
 app.route('/').get((req, res, next) => {

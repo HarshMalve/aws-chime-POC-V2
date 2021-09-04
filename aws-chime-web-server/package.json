@@ -1,0 +1,11 @@
+{
+  "name": "aws-chime-web-server",
+  "version": "1.0.0",
+  "description": "AWS Chime Web Javascript",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Harshavardhan Malve",
+  "license": "ISC"
+}
