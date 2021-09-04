@@ -8,6 +8,7 @@ const AWS = require('aws-sdk');
 const compression = require('compression');
 const fs = require('fs');
 const https = require('https');
+const path = require('path');
 const http = require('http');
 const url = require('url');
 const { v4: uuidv4 } = require('uuid');
