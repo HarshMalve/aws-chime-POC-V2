@@ -84,7 +84,7 @@ let SHOULD_EARLY_CONNECT = (() => {
 })();
 
 let SHOULD_DIE_ON_FATALS = (() => {
-  const isLocal = document.location.host === '127.0.0.1:8080' || document.location.host === 'localhost:8080';
+  const isLocal = document.location.host === '127.0.0.1:8100' || document.location.host === 'localhost:8100';
   const fatalYes = document.location.search.includes('fatal=1');
   const fatalNo = document.location.search.includes('fatal=0');
   return fatalYes || (isLocal && !fatalNo);
@@ -262,7 +262,8 @@ export class HomePage implements OnInit, AudioVideoObserver, DeviceChangeObserve
   //   location.host,
   //   location.pathname.replace(/\/*$/, '/').replace('/v2', ''),
   // ].join('');
-  static readonly BASE_URL: string = 'http://localhost:8080/';
+  // static readonly BASE_URL: string = 'http://localhost:8080/';
+  static readonly BASE_URL: string = 'https://5c93-103-143-8-246.ngrok.io/';
   static testVideo: string =
     'https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/Big_Buck_Bunny_4K.webm/Big_Buck_Bunny_4K.webm.360p.vp9.webm';
   static readonly LOGGER_BATCH_SIZE: number = 85;
