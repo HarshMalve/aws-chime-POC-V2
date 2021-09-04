@@ -3,7 +3,7 @@ const http = require('http');
 const https = require('https');
 const express = require('express');
 const path = require('path');
-const hostname = 'localhost';
+const hostname = 'harshmalve.com';
 const httpPort = 80;
 // const httpsPort = 443;
 
