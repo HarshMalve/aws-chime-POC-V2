@@ -1,4 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
+
 import {
   AsyncScheduler,
   Attendee,
@@ -170,7 +173,7 @@ class TestSound {
     private durationSec: number = 1,
     private rampSec: number = 0.1,
     private maxGainValue: number = 0.1
-  ) {}
+  ) { }
 
   async init(): Promise<void> {
     const audioContext: AudioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -245,15 +248,21 @@ interface TranscriptSegment {
   startTimeMs: number;
   endTimeMs: number;
 }
-
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage implements AudioVideoObserver, DeviceChangeObserver, ContentShareObserver, VideoDownlinkObserver {
+
+export class HomePage implements OnInit, AudioVideoObserver, DeviceChangeObserver, ContentShareObserver, VideoDownlinkObserver {
   static readonly DID: string = '+17035550122';
-  static readonly BASE_URL = 'https://d8e8-2409-4042-238d-a50f-b9fe-a2c7-bace-bcba.ngrok.io/';
+  // static readonly BASE_URL: string = [
+  //   location.protocol,
+  //   '//',
+  //   location.host,
+  //   location.pathname.replace(/\/*$/, '/').replace('/v2', ''),
+  // ].join('');
+  static readonly BASE_URL: string = 'http://localhost:8080/';
   static testVideo: string =
     'https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/Big_Buck_Bunny_4K.webm/Big_Buck_Bunny_4K.webm.360p.vp9.webm';
   static readonly LOGGER_BATCH_SIZE: number = 85;
@@ -280,6 +289,7 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
   priorityBasedDownlinkPolicy: VideoPriorityBasedPolicy | null = null;
   audioVideo: AudioVideoFacade | null = null;
   tileOrganizer: DemoTileOrganizer = new DemoTileOrganizer();
+
   canStartLocalVideo: boolean = true;
   defaultBrowserBehaviour: DefaultBrowserBehavior = new DefaultBrowserBehavior();
 
@@ -379,7 +389,7 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
   };
 
   videoMetricReport: { [id: string]: { [id: string]: {} } } = {};
-  
+
   removeFatalHandlers: () => void;
 
   transcriptContainerDiv = document.getElementById('transcript-container') as HTMLDivElement;
@@ -416,35 +426,43 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
   constructor() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (global as any).app = this;
-    console.log('BASE_URL =====> ' + HomePage.BASE_URL);
-    console.log('this.tileArea ====> ' + this.tileArea);
+
+
+  }
+
+  ngOnInit() {
+  }
+
+  ngAfterViewInit(): void {
+    //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
+    //Add 'implements AfterViewInit' to the class.
     this.addFatalHandlers();
+    this.tileArea = document.getElementById('tile-area') as HTMLDivElement;
 
     if (document.location.search.includes('testfatal=1')) {
       this.fatal(new Error('Testing fatal.'));
       return;
     }
-    setTimeout(() => {
-      (document.getElementById('sdk-version') as HTMLSpanElement).innerText =
+
+    (document.getElementById('sdk-version') as HTMLSpanElement).innerText =
       'amazon-chime-sdk-js@' + Versioning.sdkVersion;
-      this.initEventListeners();
-      this.initParameters();
-      this.setMediaRegion();
-      this.setUpVideoTileElementResizer();
-      if (this.isRecorder() || this.isBroadcaster()) {
-        AsyncScheduler.nextTick(async () => {
-          this.meeting = new URL(window.location.href).searchParams.get('m');
-          this.name = this.isRecorder() ? '«Meeting Recorder»' : '«Meeting Broadcaster»';
-          await this.authenticate();
-          await this.openAudioOutputFromSelection();
-          await this.join();
-          this.displayButtonStates();
-          this.switchToFlow('flow-meeting');
-        });
-      } else {
-        this.switchToFlow('flow-authenticate');
-      }
-    }, 1000);
+    this.initEventListeners();
+    this.initParameters();
+    this.setMediaRegion();
+    this.setUpVideoTileElementResizer();
+    if (this.isRecorder() || this.isBroadcaster()) {
+      AsyncScheduler.nextTick(async () => {
+        this.meeting = new URL(window.location.href).searchParams.get('m');
+        this.name = this.isRecorder() ? '«Meeting Recorder»' : '«Meeting Broadcaster»';
+        await this.authenticate();
+        await this.openAudioOutputFromSelection();
+        await this.join();
+        // this.displayButtonStates();
+        this.switchToFlow('flow-meeting');
+      });
+    } else {
+      this.switchToFlow('flow-authenticate');
+    }
   }
 
   /**
@@ -810,7 +828,7 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
           await this.join();
           this.audioVideo.chooseVideoInputDevice(null);
           this.hideProgress('progress-join');
-          this.displayButtonStates();
+          // this.displayButtonStates();
           this.switchToFlow('flow-meeting');
 
           if (DEBUG_LOG_PPS) {
@@ -859,16 +877,16 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
     });
 
     const buttonRecordSelf = document.getElementById('button-record-self');
-    let recorder: MediaRecorder;
+    // let recorder: MediaRecorder;
     buttonRecordSelf.addEventListener('click', _e => {
       const chunks: Blob[] = [];
       AsyncScheduler.nextTick(async () => {
-        if (!this.toggleButton('button-record-self')) {
-          console.info('Stopping recorder ', recorder);
-          recorder.stop();
-          recorder = undefined;
-          return;
-        }
+        // if (!this.toggleButton('button-record-self')) {
+        //   console.info('Stopping recorder ', recorder);
+        //   recorder.stop();
+        //   recorder = undefined;
+        //   return;
+        // }
 
         // Combine the audio and video streams.
         const mixed = new MediaStream();
@@ -885,31 +903,31 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
         const input = await av.mediaStreamBroker.acquireAudioInputStream();
         mixed.addTrack(input.getAudioTracks()[0]);
 
-        recorder = new MediaRecorder(mixed, { mimeType: 'video/webm; codecs=vp9' });
-        console.info('Setting recorder to', recorder);
-        recorder.ondataavailable = (event) => {
-          if (event.data.size) {
-            chunks.push(event.data);
-          }
-        };
+        // recorder = new MediaRecorder(mixed, { mimeType: 'video/webm; codecs=vp9' });
+        // console.info('Setting recorder to', recorder);
+        // recorder.ondataavailable = (event) => {
+        //   if (event.data.size) {
+        //     chunks.push(event.data);
+        //   }
+        // };
 
-        recorder.onstop = () => {
-          const blob = new Blob(chunks, {
-            type: 'video/webm',
-          });
-          chunks.length = 0;
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          document.body.appendChild(a);
-          /* @ts-ignore */
-          a.style = 'display: none';
-          a.href = url;
-          a.download = 'recording.webm';
-          a.click();
-          window.URL.revokeObjectURL(url);
-        };
+        // recorder.onstop = () => {
+        //   const blob = new Blob(chunks, {
+        //     type: 'video/webm',
+        //   });
+        //   chunks.length = 0;
+        //   const url = URL.createObjectURL(blob);
+        //   const a = document.createElement('a');
+        //   document.body.appendChild(a);
+        //   /* @ts-ignore */
+        //   a.style = 'display: none';
+        //   a.href = url;
+        //   a.download = 'recording.webm';
+        //   a.click();
+        //   window.URL.revokeObjectURL(url);
+        // };
 
-        recorder.start();
+        // recorder.start();
       });
     });
 
@@ -1001,7 +1019,7 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
       e.addEventListener('change', () => {
         const engineTranscribeChecked = (document.getElementById('engine-transcribe') as HTMLInputElement).checked;
         document.getElementById('engine-transcribe-language').classList.toggle('hidden', !engineTranscribeChecked);
-		    document.getElementById('engine-transcribe-medical-language').classList.toggle('hidden', engineTranscribeChecked);
+        document.getElementById('engine-transcribe-medical-language').classList.toggle('hidden', engineTranscribeChecked);
         document.getElementById('engine-transcribe-region').classList.toggle('hidden', !engineTranscribeChecked);
         document.getElementById('engine-transcribe-medical-region').classList.toggle('hidden', engineTranscribeChecked);
       });
@@ -1398,7 +1416,7 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
   showVideoStats = (
     tileIndex: number,
     keyStatstoShow: { [key: string]: string },
-    metricsData: { [id: string]: {[key: string]: number} },
+    metricsData: { [id: string]: { [key: string]: number } },
     streamDirection: string,
   ): void => {
     const streams = metricsData ? Object.keys(metricsData) : [];
@@ -1447,8 +1465,8 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
             cell = row.insertCell(-1);
             cell.innerHTML = keyStatstoShow[metricName];
           }
-            cell = row.insertCell(-1);
-            cell.innerHTML = `${value}`;
+          cell = row.insertCell(-1);
+          cell.innerHTML = `${value}`;
         }
       }
     }
@@ -1618,6 +1636,18 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
     this.setupDataMessage();
     this.setupLiveTranscription();
     this.audioVideo.addObserver(this);
+    // let localTileId = this.localTileId();
+    // const observer = {
+    //   // videoTileDidUpdate is called whenever a new tile is created or tileState changes.
+    //   videoTileDidUpdate: (tilestate) => this.videoTileDidUpdate(tilestate),
+    //   videoTileWasRemoved: tileId => {
+    //     if (localTileId === tileId) {
+    //       console.log(`You called removeLocalVideoTile. videoElement can be bound to another tile.`);
+    //       localTileId = null;
+    //     }
+    //   }
+    // };
+    // this.audioVideo.addObserver(observer);
     this.audioVideo.addContentShareObserver(this);
     this.initContentShareDropDownItems();
   }
@@ -1779,7 +1809,7 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
       if (!this.roster[attendeeId] || !this.roster[attendeeId].name) {
         this.roster[attendeeId] = {
           ...this.roster[attendeeId],
-          ... {name: externalUserId.split('#').slice(-1)[0] + (isContentAttendee ? ' «Content»' : '')}
+          ... { name: externalUserId.split('#').slice(-1)[0] + (isContentAttendee ? ' «Content»' : '') }
         };
       }
       this.audioVideo.realtimeSubscribeToVolumeIndicator(
@@ -2087,8 +2117,7 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
 
   appendNewSpeakerTranscriptDiv = (
     segment: TranscriptSegment,
-    speakerToTranscriptSpanMap: Map<string, HTMLSpanElement>) =>
-  {
+    speakerToTranscriptSpanMap: Map<string, HTMLSpanElement>) => {
     const speakerTranscriptDiv = document.createElement('div') as HTMLDivElement;
     speakerTranscriptDiv.classList.add('transcript');
 
@@ -2139,15 +2168,15 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
   async startMediaCapture(): Promise<any> {
     await fetch(
       `${HomePage.BASE_URL}startCapture?title=${encodeURIComponent(this.meeting)}`, {
-        method: 'POST',
-      });
+      method: 'POST',
+    });
   }
 
   async stopMediaCapture(): Promise<any> {
     await fetch(
       `${HomePage.BASE_URL}endCapture?title=${encodeURIComponent(this.meeting)}`, {
-        method: 'POST',
-      });
+      method: 'POST',
+    });
   }
 
 
@@ -2187,8 +2216,7 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
     // Also note that Firefox has its own device picker, which may be useful
     // for the first device selection. Subsequent device selections could use
     // a custom UX with a specific device id.
-    if(!this.defaultBrowserBehaviour.doesNotSupportMediaDeviceLabels())
-    {
+    if (!this.defaultBrowserBehaviour.doesNotSupportMediaDeviceLabels()) {
       this.audioVideo.setDeviceLabelTrigger(
         async (): Promise<MediaStream> => {
           if (this.isRecorder() || this.isBroadcaster()) {
@@ -2199,7 +2227,7 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
           this.switchToFlow('flow-devices');
           return stream;
         }
-    );
+      );
     }
   }
 
@@ -2256,7 +2284,7 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
       });
     }
     if (additionalOptions.length) {
-      this.createDropdownMenuItem(menu, '──────────', () => {}).classList.add('text-center');
+      this.createDropdownMenuItem(menu, '──────────', () => { }).classList.add('text-center');
       for (const additionalOption of additionalOptions) {
         this.createDropdownMenuItem(
           menu,
@@ -2269,7 +2297,7 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
       }
     }
     if (additionalToggles?.length) {
-      this.createDropdownMenuItem(menu, '──────────', () => {}).classList.add('text-center');
+      this.createDropdownMenuItem(menu, '──────────', () => { }).classList.add('text-center');
       for (const { name, oncreate, action } of additionalToggles) {
         const id = `toggle-${elementId}-${name.replace(/\s/g, '-')}`;
         const elem = this.createDropdownMenuItem(menu, name, action, id);
@@ -2277,7 +2305,7 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
       }
     }
     if (!menu.firstElementChild) {
-      this.createDropdownMenuItem(menu, 'Device selection unavailable', () => {});
+      this.createDropdownMenuItem(menu, 'Device selection unavailable', () => { });
     }
   }
 
@@ -3032,7 +3060,7 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
   audioVideoDidStartConnecting(reconnecting: boolean): void {
     this.log(`session connecting. reconnecting: ${reconnecting}`);
     if (reconnecting && this.isAbortingOnReconnect()) {
-        fatal(Error('reconnect occured with abort-on-reconnect set to true'));
+      fatal(Error('reconnect occured with abort-on-reconnect set to true'));
     }
   }
 
@@ -3145,29 +3173,29 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
   }
 
   createPauseResumeListener(tileState: VideoTileState): (event: Event) => void {
-      return (event: Event): void => {
-        if (!tileState.paused) {
-            this.audioVideo.pauseVideoTile(tileState.tileId);
-            (event.target as HTMLButtonElement).innerText = 'Resume';
-          } else {
-            this.audioVideo.unpauseVideoTile(tileState.tileId);
-            (event.target as HTMLButtonElement).innerText = 'Pause';
-          }
-        }
+    return (event: Event): void => {
+      if (!tileState.paused) {
+        this.audioVideo.pauseVideoTile(tileState.tileId);
+        (event.target as HTMLButtonElement).innerText = 'Resume';
+      } else {
+        this.audioVideo.unpauseVideoTile(tileState.tileId);
+        (event.target as HTMLButtonElement).innerText = 'Pause';
+      }
+    }
   }
 
   createPinUnpinListener(tileState: VideoTileState): (event: Event) => void {
     return (event: Event): void => {
       const attendeeId = tileState.boundAttendeeId;
-        if (this.roster[attendeeId].pinned ) {
-          (event.target as HTMLButtonElement).innerText = 'Pin';
-          this.roster[attendeeId].pinned = false;
-        } else {
-          (event.target as HTMLButtonElement).innerText = 'Unpin';
-          this.roster[attendeeId].pinned = true;
-        }
-        this.updateDownlinkPreference();
+      if (this.roster[attendeeId].pinned) {
+        (event.target as HTMLButtonElement).innerText = 'Pin';
+        this.roster[attendeeId].pinned = false;
+      } else {
+        (event.target as HTMLButtonElement).innerText = 'Unpin';
+        this.roster[attendeeId].pinned = true;
       }
+      this.updateDownlinkPreference();
+    }
   }
 
   updateDownlinkPreference(): void {
@@ -3339,12 +3367,14 @@ export class HomePage implements AudioVideoObserver, DeviceChangeObserver, Conte
     const localTileId = this.localTileId();
     const activeTile = this.activeTileId();
 
-    this.tileArea.className = `v-grid size-${this.availablelTileSize()}`;
+    if (this.tileArea) {
+      this.tileArea.className = `v-grid size-${this.availablelTileSize()}`;
 
-    if (activeTile && activeTile !== localTileId) {
-      this.tileArea.classList.add('featured');
-    } else {
-      this.tileArea.classList.remove('featured');
+      if (activeTile && activeTile !== localTileId) {
+        this.tileArea.classList.add('featured');
+      } else {
+        this.tileArea.classList.remove('featured');
+      }
     }
   }
 
