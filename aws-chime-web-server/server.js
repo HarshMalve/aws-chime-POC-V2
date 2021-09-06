@@ -3,16 +3,19 @@
 const fs = require('fs');
 const compression = require('compression');
 const url = require('url');
-const http = require('http');
+const https = require('http');
 const app = process.env.npm_config_app || 'meetingV2';
 const indexPagePath = `dist/${app}.html`;
 
 console.info('Using index path', indexPagePath);
 
 const indexPage = fs.readFileSync(indexPagePath);
-
-function serve(host = '127.0.0.1:8080') {
-    http.createServer({}, async (request, response) => {
+const httpsOptions = {
+    cert: fs.readFileSync(path.join('/etc/letsencrypt/live/harshmalve.com/cert.pem')),
+    key: fs.readFileSync(path.join('/etc/letsencrypt/live/harshmalve.com/privkey.pem'))
+  };
+function serve(host = '127.0.0.1:80' || '127.0.0.1:80.0.0.1:443') {
+    https.createServer(httpsOptions, async (request, response) => {
         try {
             compression({})(request, response, () => { });
             const requestUrl = url.parse(request.url, true);

@@ -9,7 +9,6 @@ const compression = require('compression');
 const fs = require('fs');
 const https = require('https');
 const path = require('path');
-const http = require('http');
 const url = require('url');
 const { v4: uuidv4 } = require('uuid');
 const dotenv = require('dotenv');
@@ -28,7 +27,7 @@ app.use(function(req, res, next){
 });
 
 // Store created meetings in a map so attendees can join by meeting title.
-const meetingTable = {};
+var meetingTable = [];
 
 // Load the contents of the web application to be used as the index page.
 // const app = process.env.npm_config_app || 'meetingV2';
@@ -72,10 +71,6 @@ const httpsOptions = {
 https.createServer(httpsOptions, app).listen(config.app.port, function () {
   log(`server running at ${config.app.port}`);
 });
-  // Start an HTTP server to serve the index page and handle meeting actions
-  // http.createServer(app).listen(config.app.port, (request, response) => {
-  //   log(`server running at ${config.app.port}`);
-  // });
 
 app.route('/').get((req, res, next) => {
   respond(res, 200, 'text/html', 'Server is Working');
