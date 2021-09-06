@@ -1695,7 +1695,7 @@ export class HomePage implements OnInit, AudioVideoObserver, DeviceChangeObserve
 
   private isLocalHost(): boolean {
     console.log('document.location.host   ===========>>> ' + document.location.host);
-    return document.location.host === '127.0.0.1:8100' || document.location.host === 'localhost:8100' || document.location.host === 'localhost' || document.location.host === 'ionic://localhost/home';
+    return document.location.host === '127.0.0.1:8100' || document.location.host === 'localhost:8100' || document.location.host === 'localhost';
   }
 
   async join(): Promise<void> {
