@@ -6,12 +6,12 @@ const url = require('url');
 const http = require('http');
 const app = process.env.npm_config_app || 'meetingV2';
 const indexPagePath = `dist/${app}.html`;
-
+const port = 80;
 console.info('Using index path', indexPagePath);
 
 const indexPage = fs.readFileSync(indexPagePath);
 
-function serve(host = '127.0.0.1:80') {
+function serve() {
     http.createServer({}, async (request, response) => {
         try {
             compression({})(request, response, () => { });
@@ -23,8 +23,8 @@ function serve(host = '127.0.0.1:80') {
         } catch (error) {
 
         }
-    }).listen(host.split(':')[1], host.split(':')[0], () => {
-        log(`server running at http://${host}/`);
+    }).listen(port, () => {
+        log(`server running at port ${port}`);
     });
 }
 
