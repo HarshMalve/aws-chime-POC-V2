@@ -14,7 +14,7 @@ const httpsOptions = {
     cert: fs.readFileSync(path.join('/etc/letsencrypt/live/harshmalve.com/cert.pem')),
     key: fs.readFileSync(path.join('/etc/letsencrypt/live/harshmalve.com/privkey.pem'))
   };
-function serve(host = '127.0.0.1:8080' || '127.0.0.1:80.0.0.1:443') {
+function serve(host = '127.0.0.1:80' || '127.0.0.1:80.0.0.1:443') {
     https.createServer(httpsOptions, async (request, response) => {
         try {
             compression({})(request, response, () => { });
