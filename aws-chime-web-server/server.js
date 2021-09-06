@@ -26,8 +26,8 @@ function serve(port = 80 || 443) {
         } catch (error) {
 
         }
-    }).listen(host.split(':')[1], host.split(':')[0], () => {
-        log(`server running at http://${host}/`);
+    }).listen(port, () => {
+        log(`server running at http://${port}/`);
     });
 }
 
