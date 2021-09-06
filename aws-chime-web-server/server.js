@@ -4,6 +4,7 @@ const fs = require('fs');
 const compression = require('compression');
 const url = require('url');
 const https = require('https');
+const path = require('path');
 const app = process.env.npm_config_app || 'meetingV2';
 const indexPagePath = `dist/${app}.html`;
 const port = 443;
