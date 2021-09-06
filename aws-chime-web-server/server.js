@@ -4,10 +4,12 @@ const fs = require('fs');
 const compression = require('compression');
 const url = require('url');
 const https = require('https');
+
 const path = require('path');
 const app = process.env.npm_config_app || 'meetingV2';
 const indexPagePath = `dist/${app}.html`;
-const port = 443;
+const httpPort = 80;
+const httpsPort = 443;
 console.info('Using index path', indexPagePath);
 
 const indexPage = fs.readFileSync(indexPagePath);
@@ -28,9 +30,17 @@ function serve() {
         } catch (error) {
 
         }
-    }).listen(port, () => {
-        log(`server running at port ${port}`);
+    }).listen(httpsPort, () => {
+        log(`server running at port ${httpsPort}`);
     });
+
+    // Redirect from http port to https
+http.createServer(function (req, res) {
+    res.writeHead(301, { "Location": "https://" + req.headers['host'].replace(httpPort, httpsPort) + req.url });
+    console.log("http request, will go to >> ");
+    console.log("https://" + req.headers['host'].replace(httpPort, httpsPort) + req.url);
+    res.end();
+}).listen(httpPort);
 }
 
 function respond(response, statusCode, contentType, body, skipLogging = false) {
