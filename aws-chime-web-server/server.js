@@ -6,7 +6,7 @@ const url = require('url');
 const https = require('http');
 const app = process.env.npm_config_app || 'meetingV2';
 const indexPagePath = `dist/${app}.html`;
-
+const path = require('path');
 console.info('Using index path', indexPagePath);
 
 const indexPage = fs.readFileSync(indexPagePath);
